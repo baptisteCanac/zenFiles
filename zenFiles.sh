@@ -1,26 +1,28 @@
+#!/bin/bash
+
 clear
 
-if [ $# -eq 0 ]; then
-    echo "mode sans parametres"
-elif [ $# -eq 2 ]; then
-    echo "mode deux parametre"
-    for i in $(ls $1); do
-        mkdir $2/${i##*.}
-        echo $2/${i##*.}
-    done
+mkdir -p results
 
-    for i in $(ls $1); do
-        cp $1/$i $2/${i##*.}
-    done
-elif [ $1 == "--help" ]; then
-    echo "
-- zenFiles.sh source_directory_path target directory_path
+for file in *; do
+    [ -f "$file" ] || continue  # Ignore les répertoires
+    ext="${file##*.}"
+    mkdir -p "results/$ext"  # Crée le dossier s'il n'existe pas
+done
 
-- zenFiles.sh
-
-- go on https://github.com/baptisteCanac/zenFiles to get better informations
-    "
-else
-    echo "Nombre de parametres incorrect"
-    exit
-fi
+case "$1" in
+    "-copy")
+        for file in *; do
+            [ -f "$file" ] && cp "$file" "results/${file##*.}/"
+        done
+        ;;
+    "-move")
+        for file in *; do
+            [ -f "$file" ] && mv "$file" "results/${file##*.}/"
+        done
+        ;;
+    *)
+        echo "Usage: $0 [-copy | -move]"
+        exit 1
+        ;;
+esac
